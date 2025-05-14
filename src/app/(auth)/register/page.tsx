@@ -21,6 +21,26 @@ export default function RegisterPage() {
     password: "",
     confirmPassword: "",
   });
+
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const response = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "Application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+    if (!response.ok) {
+      return;
+    }
+    console.log(response.json());
+    setLoading(false);
+  };
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-sky-950">
       <Card className="w-[80%] md:w-[480px] md:p-4 p-6 bg-white shadow-lg rounded-lg">
@@ -31,14 +51,15 @@ export default function RegisterPage() {
           Join us to unlock new features and connect with others!
         </CardDescription>
         <CardContent>
-          <form className="flex flex-col gap-3">
+          <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
             <Input
               value={formData.username}
               onChange={(e) =>
                 setFormData({ ...formData, username: e.target.value })
               }
-              placeholder="Enter your email"
-              type="email"
+              placeholder="Enter your username"
+              type="text"
+              disabled={loading}
               required
             />
             <Input
@@ -46,8 +67,9 @@ export default function RegisterPage() {
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
-              placeholder="Enter your password"
-              type="password"
+              placeholder="Enter your email"
+              type="email"
+              disabled={loading}
               required
             />
             <Input
@@ -55,8 +77,9 @@ export default function RegisterPage() {
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }
-              placeholder="Enter your username"
-              type="text"
+              placeholder="Enter your password"
+              type="password"
+              disabled={loading}
               required
             />
             <Input
@@ -66,11 +89,13 @@ export default function RegisterPage() {
               }
               placeholder="Confirm password"
               type="password"
+              disabled={loading}
               required
             />
             <Button
+              disabled={loading}
               type="submit"
-              className="bg-sky-600 text-white hover:bg-sky-700 transition w-full"
+              className=" disabled:bg-slate-700 bg-sky-600 text-white hover:bg-sky-700 transition w-full"
             >
               Register
             </Button>
@@ -78,11 +103,17 @@ export default function RegisterPage() {
           <Separator />
 
           <div className="w-full flex items-center gap-3 mt-2">
-            <Button className="flex w-full md:w-[48%] items-center justify-center bg-gray-800 text-white hover:bg-gray-700 transition py-2 rounded">
+            <Button
+              disabled={loading}
+              className=" disabled:bg-slate-700 flex w-full md:w-[48%] items-center justify-center bg-gray-800 text-white hover:bg-gray-700 transition py-2 rounded"
+            >
               <FaGithub />
               <span className="ml-2">Register with GitHub</span>
             </Button>
-            <Button className="flex w-full md:w-[48%] items-center justify-center bg-slate-400 text-white hover:bg-slate-500 transition py-2 rounded">
+            <Button
+              disabled={loading}
+              className=" disabled:bg-slate-700 flex w-full md:w-[48%] items-center justify-center bg-slate-400 text-white hover:bg-slate-500 transition py-2 rounded"
+            >
               <FcGoogle />
               <span className="ml-2">Register with Google</span>
             </Button>
