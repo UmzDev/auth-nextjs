@@ -3,80 +3,147 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
-  CardTitle,
   CardDescription,
   CardContent,
+  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+
 import Link from "next/link";
-import { useState } from "react";
+
+//react icons
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { TriangleAlert } from "lucide-react";
 
-export default function RegisterPage() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+const SignIn = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const isValidEmail = (email: string) => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    };
+    if (!email || !password) {
+      setError("All fields are required");
+      return;
+    }
+    
+    if (!isValidEmail(email)) {
+      setError("Invalid email format");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 character long");
+      return;
+    }
+    setLoading(true);
+
+    const response = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+    });
+    if (!response?.ok) {
+      setError("Invalid Credentials");
+      setLoading(false);
+      return;
+    }
+    router.push("/");
+    toast.success("login successful");
+  };
+
+  const handleProvider = async (
+    event: React.MouseEvent<HTMLButtonElement>,
+    value: "github" | "google"
+  ) => {
+    event.preventDefault();
+
+    try {
+      await signIn(value, { callbackUrl: "/" });
+    } catch (error) {
+      console.error("Error signing in:", error);
+    }
+  };
   return (
-    <div className="flex justify-center items-center min-h-screen bg-sky-950">
-      <Card className="w-[80%] md:w-[480px] md:p-4 p-6 bg-white shadow-lg rounded-lg">
-        <CardHeader className="text-center font-bold text-2xl text-sky-800 border-b pb-2">
-          <CardTitle>Sign In</CardTitle>
+    <div className="h-full flex items-center justify-center bg-[#1b0918]">
+      <Card className="md:h-auto w-[80%] sm:w-[420px] p-4 sm:p-8">
+        <CardHeader>
+          <CardTitle className="text-center">Sign in</CardTitle>
+          <CardDescription className="text-sm text-center text-accent-foreground">
+            Use email or service, to sign in
+          </CardDescription>
         </CardHeader>
-        <CardDescription className="text-center font-medium text-lg text-gray-600 mb-4">
-          Join us to access exclusive features and stay connected!
-        </CardDescription>
-        <CardContent>
-          <form className="flex flex-col gap-3">
+        <CardContent className="px-2 sm:px-6">
+          {!!error && (
+            <CardDescription className="bg-destructive/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive mb-6">
+              <TriangleAlert />
+              <p>{error}</p>
+            </CardDescription>
+          )}
+          <form onSubmit={handleSubmit} className="space-y-3">
             <Input
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              placeholder="Enter your email"
-              type="email"
+              type="text"
+              disabled={loading}
+              placeholder="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
             <Input
-              value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-              placeholder="Enter your password"
               type="password"
+              disabled={loading}
+              placeholder="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
 
-            <Button
-              type="submit"
-              className="bg-sky-600 text-white hover:bg-sky-700 transition w-full"
-            >
-              Login
+            <Button className="w-full" size="lg" disabled={loading}>
+              login
             </Button>
           </form>
+
           <Separator />
-
-          <div className="w-full flex items-center gap-3 mt-2">
-            <Button className="flex w-full md:w-[48%] items-center justify-center bg-gray-800 text-white hover:bg-gray-700 transition py-2 rounded">
-              <FaGithub />
-              <span className="ml-2">Login with GitHub</span>
+          <div className="flex my-2 justify-evenly mx-auto items-center">
+            <Button
+              disabled={loading}
+              className=" disabled:bg-slate-700 flex w-full md:w-[48%] items-center justify-center bg-gray-800 text-white hover:bg-gray-700 transition py-2 rounded"
+            >
+              <FcGoogle className="size-6 left-2.5 top-2.5" />
             </Button>
-            <Button className="flex w-full md:w-[48%] items-center justify-center bg-slate-400 text-white hover:bg-slate-500 transition py-2 rounded">
-              <FcGoogle />
-              <span className="ml-2">Login with Google</span>
+            <Button
+              disabled={loading}
+              onClick={(e) => handleProvider(e, "github")}
+              className=" disabled:bg-slate-700 flex w-full md:w-[48%] items-center justify-center bg-gray-800 text-white hover:bg-gray-700 transition py-2 rounded"
+            >
+              <FaGithub className="size-6 left-2.5 top-2.5" />
             </Button>
           </div>
-
-          <div className="text-center mt-4 flex gap-1">
-            <p>D&apos;ont have an account?</p>
-            <Link href="/register" className="text-sky-700 underline">
-              Create a new account
+          <p className="text-center text-sm mt-2 text-muted-foreground">
+            Create new account
+            <Link
+              className="text-sky-700 ml-4 hover:underline cursor-pointer"
+              href="register"
+            >
+              Sing up{" "}
             </Link>
-          </div>
+          </p>
         </CardContent>
       </Card>
     </div>
   );
-}
+};
+
+export default SignIn;

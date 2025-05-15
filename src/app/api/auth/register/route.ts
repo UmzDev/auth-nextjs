@@ -1,75 +1,49 @@
-import ConnectToDatabase from "@/utils/mongodb";
-import bcrypt from "bcryptjs";
-import { NextRequest, NextResponse } from "next/server";
-import User from "../../../../../models/userModel";
+import bcrypt from 'bcryptjs';
+import { NextResponse } from 'next/server'
+import User from '@/models/user'
+import connectToDatabase from '@/lib/mongodb';
 
-export async function POST(req: NextRequest) {
-  const { username, email, password, confirmPassword } = await req.json();
 
-  const isValidEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple email regex
-    return emailRegex.test(email);
-  };
+export async function POST(req: Request) {
+    const { name, email, password, confirmPassword } = await req.json();
 
-  if (!username || !email || !password || !confirmPassword) {
-    return NextResponse.json(
-      { message: "All fields are required." },
-      { status: 400 }
-    );
-  }
-
-  if (!isValidEmail(email)) {
-    return NextResponse.json(
-      { message: "Invalid email format." },
-      { status: 400 }
-    );
-  }
-
-  if (password !== confirmPassword) {
-    return NextResponse.json(
-      { message: "Passwords do not match." },
-      { status: 400 }
-    );
-  }
-
-  if (password.length < 6) {
-    return NextResponse.json(
-      { message: "Password must be at least 6 character long" },
-      { status: 400 }
-    );
-  }
-
-  try {
-    // Connect to MongoDB (optional, depending on your logic)
-    await ConnectToDatabase();
-
-    // Hash the password (you can also add your database logic here)
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return NextResponse.json(
-        { message: "User already exist" },
-        { status: 400 }
-      );
+    const isValidEmail = (email: string) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+    if (!name || !email || !password || !confirmPassword) {
+        return NextResponse.json({message: " All fields are required"}, {status:400})
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    if (!isValidEmail(email)) {
+        return NextResponse.json({ message: "Invalid email format" }, { status: 400 });
+    }
+    if (confirmPassword !== password) {
+        return NextResponse.json({message:"Password do not match"}, { status:400})
+    }
+    if (password.length < 6) {
+        return NextResponse.json({ message: "Password must be at least 6 character long" }, { status: 400 });
+    }
 
-    const newUser = new User({
-      username,
-      email,
-      password: hashedPassword,
-    });
+    try {
+        await connectToDatabase();
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return NextResponse.json({ message: "User already exist" }, { status: 400 });
+        }
 
-    await newUser.save();
-    return NextResponse.json(
-      { message: "User registered successfully." },
-      { status: 201 }
-    );
-  } catch (err) {
-    return NextResponse.json(
-      { message: "Failed registering ", err },
-      { status: 500 }
-    );
-  }
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = new User({
+            email,
+            name,
+            password: hashedPassword,
+        });
+        await newUser.save();
+        return NextResponse.json({ message: "User created" }, { status: 201 });
+
+    } catch (error) {
+        console.log(error)
+        return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
+    }
 }

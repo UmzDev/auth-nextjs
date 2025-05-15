@@ -1,10 +1,15 @@
-import Link from "next/link";
+"use client";
+import {SessionProvider} from "next-auth/react"
+import UserButton from "@/components/user-button";
 
-export default function Home() {
+const Home = () => {
   return (
-
-      <main className="container flex items-center justify-center min-h-screen">
-        <Link href={"/login"}>Go to login</Link>
-      </main>
+    <div>
+      <SessionProvider>
+        <UserButton />
+      </SessionProvider>
+    </div>
   );
-}
+};
+
+export default Home;

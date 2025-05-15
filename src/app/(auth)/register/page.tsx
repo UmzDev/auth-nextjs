@@ -3,130 +3,147 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
-  CardTitle,
   CardDescription,
   CardContent,
+  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+
 import Link from "next/link";
-import { useState } from "react";
+
+//react icons
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { TriangleAlert } from "lucide-react";
+import { signIn } from "next-auth/react";
 
-export default function RegisterPage() {
-  const [formData, setFormData] = useState({
-    username: "",
+const SignUp = () => {
+  const [form, setForm] = useState({
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
-
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
     const response = await fetch("/api/auth/register", {
       method: "POST",
-      headers: {
-        "Content-Type": "Application/json",
-      },
-      body: JSON.stringify(formData),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
     });
+    const data = await response.json();
+
     if (!response.ok) {
+      setError(data.message);
+      setLoading(false);
       return;
     }
-    console.log(response.json());
     setLoading(false);
+    toast.success(data.message);
+    router.push("/login");
   };
 
+  const handleProvider = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    value: "github" | "google"
+  ) => {
+    event.preventDefault();
+    signIn(value, { callbackUrl: "/" });
+  };
   return (
-    <div className="flex justify-center items-center min-h-screen bg-sky-950">
-      <Card className="w-[80%] md:w-[480px] md:p-4 p-6 bg-white shadow-lg rounded-lg">
-        <CardHeader className="text-center font-bold text-2xl text-sky-800 border-b pb-2">
-          <CardTitle>Sign Up</CardTitle>
+    <div className="h-full flex items-center justify-center bg-[#1b0918]">
+      <Card className="md:h-auto w-[80%] sm:w-[420px] p-4 sm:p-8">
+        <CardHeader>
+          <CardTitle className="text-center">Sign up</CardTitle>
+          <CardDescription className="text-sm text-center text-accent-foreground">
+            Use email or service, to create account
+          </CardDescription>
         </CardHeader>
-        <CardDescription className="text-center font-medium text-lg text-gray-600 mb-4">
-          Join us to unlock new features and connect with others!
-        </CardDescription>
-        <CardContent>
-          <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+        <CardContent className="px-2 sm:px-6">
+        {!!error && (
+          <div className="bg-destructive/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive mb-6">
+            <TriangleAlert />
+            <p>{error}</p>
+          </div>
+        )}
+          <form onSubmit={handleSubmit} className="space-y-3">
             <Input
-              value={formData.username}
-              onChange={(e) =>
-                setFormData({ ...formData, username: e.target.value })
-              }
-              placeholder="Enter your username"
               type="text"
               disabled={loading}
+              placeholder="Full name"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
             />
             <Input
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              placeholder="Enter your email"
-              type="email"
+              type="text"
               disabled={loading}
+              placeholder="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
               required
             />
             <Input
-              value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-              placeholder="Enter your password"
               type="password"
               disabled={loading}
+              placeholder="password"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
               required
             />
             <Input
-              value={formData.confirmPassword}
-              onChange={(e) =>
-                setFormData({ ...formData, confirmPassword: e.target.value })
-              }
-              placeholder="Confirm password"
               type="password"
               disabled={loading}
+              placeholder="confirm password"
+              value={form.confirmPassword}
+              onChange={(e) =>
+                setForm({ ...form, confirmPassword: e.target.value })
+              }
               required
             />
-            <Button
-              disabled={loading}
-              type="submit"
-              className=" disabled:bg-slate-700 bg-sky-600 text-white hover:bg-sky-700 transition w-full"
-            >
-              Register
+            <Button className="w-full" size="lg" disabled={loading}>
+              register
             </Button>
           </form>
-          <Separator />
-
-          <div className="w-full flex items-center gap-3 mt-2">
+          <Separator />{" "}
+          <div className="flex my-2 justify-evenly mx-auto items-center">
             <Button
               disabled={loading}
               className=" disabled:bg-slate-700 flex w-full md:w-[48%] items-center justify-center bg-gray-800 text-white hover:bg-gray-700 transition py-2 rounded"
             >
-              <FaGithub />
-              <span className="ml-2">Register with GitHub</span>
+              <FcGoogle className="size-6 left-2.5 top-2.5" />
             </Button>
             <Button
               disabled={loading}
-              className=" disabled:bg-slate-700 flex w-full md:w-[48%] items-center justify-center bg-slate-400 text-white hover:bg-slate-500 transition py-2 rounded"
+              onClick={(e) => handleProvider(e, "github")}
+              className=" disabled:bg-slate-700 flex w-full md:w-[48%] items-center justify-center bg-gray-800 text-white hover:bg-gray-700 transition py-2 rounded"
             >
-              <FcGoogle />
-              <span className="ml-2">Register with Google</span>
+              <FaGithub className="size-6 left-2.5 top-2.5" />
             </Button>
-          </div>
-
-          <div className="text-center mt-4 flex gap-1">
-            <p>Already have an account?</p>
-            <Link href="/login" className="text-sky-700 underline">
-              login to my account
+          </div>{" "}
+          <p className="text-center text-sm mt-2 text-muted-foreground">
+            Already have an account?
+            <Link
+              className="text-sky-700 ml-4 hover:underline cursor-pointer"
+              href="login"
+            >
+              Sing in{" "}
             </Link>
-          </div>
+          </p>
         </CardContent>
       </Card>
     </div>
   );
-}
+};
+
+export default SignUp;
