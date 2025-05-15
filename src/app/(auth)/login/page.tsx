@@ -30,7 +30,7 @@ const SignIn = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const isValidEmail = (email: string) => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
@@ -39,7 +39,7 @@ const SignIn = () => {
       setError("All fields are required");
       return;
     }
-    
+
     if (!isValidEmail(email)) {
       setError("Invalid email format");
       return;
@@ -119,6 +119,7 @@ const SignIn = () => {
           <div className="flex my-2 justify-evenly mx-auto items-center">
             <Button
               disabled={loading}
+              onClick={(e) => handleProvider(e, "google")}
               className=" disabled:bg-slate-700 flex w-full md:w-[48%] items-center justify-center bg-gray-800 text-white hover:bg-gray-700 transition py-2 rounded"
             >
               <FcGoogle className="size-6 left-2.5 top-2.5" />

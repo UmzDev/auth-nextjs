@@ -70,12 +70,12 @@ const SignUp = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="px-2 sm:px-6">
-        {!!error && (
-          <div className="bg-destructive/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive mb-6">
-            <TriangleAlert />
-            <p>{error}</p>
-          </div>
-        )}
+          {!!error && (
+            <div className="bg-destructive/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive mb-6">
+              <TriangleAlert />
+              <p>{error}</p>
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-3">
             <Input
               type="text"
@@ -119,6 +119,7 @@ const SignUp = () => {
           <div className="flex my-2 justify-evenly mx-auto items-center">
             <Button
               disabled={loading}
+              onClick={(e) => handleProvider(e, "google")}
               className=" disabled:bg-slate-700 flex w-full md:w-[48%] items-center justify-center bg-gray-800 text-white hover:bg-gray-700 transition py-2 rounded"
             >
               <FcGoogle className="size-6 left-2.5 top-2.5" />

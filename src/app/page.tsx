@@ -1,12 +1,14 @@
 "use client";
 import {SessionProvider} from "next-auth/react"
-import UserButton from "@/components/user-button";
+import UserButtonClientSide from "@/components/UserButtonClientSide";
+// import UserButtonServerSide from "@/components/UserButtonServerSide";
 
 const Home = () => {
   return (
     <div>
       <SessionProvider>
-        <UserButton />
+        <UserButtonClientSide />
+        {/* <UserButtonServerSide /> */}
       </SessionProvider>
     </div>
   );

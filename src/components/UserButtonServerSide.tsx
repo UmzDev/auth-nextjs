@@ -5,28 +5,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { Loader } from "lucide-react";
+import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { getServerSession, type Session } from "next-auth";
+import { authOptions } from "@/lib/nextAuth";
 
-const UserButton = () => {
-  const router = useRouter();
-  const { data: session, status } = useSession();
-  
-  if (status === "loading") {
-    return <Loader className="size-6 mr-4 mt-4 float-right animate-spin" />;
-  }
-  
-  console.log('data :', session);
-  console.log(session?.user?.name);
+const UserButtonServerSide = async () => {
+  const session: Session | null = await getServerSession(authOptions);
+  console.log("data :", session);
   const avatarFallback = session?.user?.name?.charAt(0).toUpperCase();
   const handleSignOut = async () => {
     await signOut({
       redirect: false,
     });
-    router.push("/");
+    location.href = '/';
   };
   return (
     <nav>
@@ -66,4 +59,4 @@ const UserButton = () => {
   );
 };
 
-export default UserButton;
+export default UserButtonServerSide;
