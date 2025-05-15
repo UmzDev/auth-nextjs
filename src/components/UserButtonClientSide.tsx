@@ -52,10 +52,13 @@ const UserButtonClientSide = () => {
       ) : (
         <div className="flex justify-end p-4 gap-4">
           <Button>
-            <Link href="login">Sign in</Link>
+            <Link href="auth/login">Sign in</Link>
           </Button>
           <Button>
-            <Link href="register">Sign up</Link>
+            <Link href="auth/register">Sign up</Link>
+          </Button>
+          <Button>
+            <Link href="profile">Profile</Link>
           </Button>
         </div>
       )}

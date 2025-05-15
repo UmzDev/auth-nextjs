@@ -136,7 +136,7 @@ const SignIn = () => {
             Create new account
             <Link
               className="text-sky-700 ml-4 hover:underline cursor-pointer"
-              href="register"
+              href="auth/register"
             >
               Sing up{" "}
             </Link>
