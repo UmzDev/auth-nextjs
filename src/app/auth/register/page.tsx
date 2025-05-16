@@ -50,7 +50,7 @@ const SignUp = () => {
     }
     setLoading(false);
     toast.success(data.message);
-    router.push("/login");
+    router.push("/auth/login");
   };
 
   const handleProvider = (
@@ -135,10 +135,10 @@ const SignUp = () => {
           <p className="text-center text-sm mt-2 text-muted-foreground">
             Already have an account?
             <Link
-              className="text-sky-700 ml-4 hover:underline cursor-pointer"
-              href="auth/login"
+              className="text-sky-700 hover:underline cursor-pointer"
+              href="/auth/login"
             >
-              Sing in{" "}
+              {" "}Sing in
             </Link>
           </p>
         </CardContent>

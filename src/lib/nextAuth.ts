@@ -29,19 +29,24 @@ export const authOptions: AuthOptions = {
         try {
           await connectToDatabase();
           const user = await User.findOne({ email: credentials?.email });
+
           if (!user) {
-            throw new Error("");
+            throw new Error("User not found");
           }
+
           const isValidPassword = await bcrypt.compare(
             credentials?.password ?? "",
             user.password as string
           );
+
           if (!isValidPassword) {
-            throw new Error("");
+            throw new Error("Invalid password");
           }
-          return user;
-        } catch {
-          return null;
+
+          return user; // Return the user object if authentication is successful
+        } catch (error) {
+          console.error("Authorization error:", error); // Log the error message
+          return null; // Return null if any error occurs
         }
       },
     }),

@@ -5,6 +5,8 @@ interface IUser extends Document {
   email: string;
   password?: string;
   id: string;
+  resetToken?: string;
+  resetTokenExpiry?: Date;
 }
 
 const UserSchema: Schema<IUser> = new mongoose.Schema({
@@ -19,6 +21,14 @@ const UserSchema: Schema<IUser> = new mongoose.Schema({
   },
   password: {
     type: String,
+    required: false,
+  },
+  resetToken: {
+    type: String,
+    required: false,
+  },
+  resetTokenExpiry: {
+    type: Date,
     required: false,
   },
 });

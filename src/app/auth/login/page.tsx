@@ -114,7 +114,6 @@ const SignIn = () => {
               login
             </Button>
           </form>
-
           <Separator />
           <div className="flex my-2 justify-evenly mx-auto items-center">
             <Button
@@ -132,15 +131,23 @@ const SignIn = () => {
               <FaGithub className="size-6 left-2.5 top-2.5" />
             </Button>
           </div>
-          <p className="text-center text-sm mt-2 text-muted-foreground">
-            Create new account
+          <div className="text-center ">
             <Link
-              className="text-sky-700 ml-4 hover:underline cursor-pointer"
-              href="auth/register"
+              className="text-muted-foreground mt-4 cursor-pointer"
+              href="/auth/forget-password"
             >
-              Sing up{" "}
+              Did you forget your password?
             </Link>
-          </p>
+            <p className="text-sm mt-2 text-muted-foreground">
+              Create new account?
+              <Link
+                className="text-sky-700 hover:underline cursor-pointer"
+                href="/auth/register"
+              >
+                {" "}Sing up
+              </Link>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
